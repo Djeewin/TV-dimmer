@@ -1,11 +1,11 @@
-# TV Dimmer 1.6.2
+# TV Dimmer 1.6.8
 
 Native Android TV dimmer for personal sideloading, Android 8 or later. No internet permission, analytics, accounts or third party runtime libraries.
 
 ![TV Dimmer](docs/preview.png)
 
 - At launch, remote focus starts on the ON/OFF circle, so the first OK press toggles dimming. While OFF, its white outline breathes gently; the animation stops when the activity is paused. Pressing Right from the circle selects the brightness slider without changing its value. At brightness 10, further Right presses keep focus on the slider and do nothing; other directions behave as before.
-- Press ON/OFF to override scheduled dimming immediately.
+- Press ON/OFF to override dimming until the next schedule boundary, standby or restart.
 - While the dimmer is OFF, remote or touch slider adjustments only save the selected brightness level; the screen stays at normal brightness. Turning the dimmer ON applies that selected level. While ON, slider changes apply immediately and the chosen brightness continues after leaving the app.
 - Level 1 leaves about 5% of the rendered picture; level 10 removes the overlay.
 - Daily schedules all days. For weekly/custom recurrence, switch Daily OFF and select one or more weekday checkboxes.
@@ -14,9 +14,11 @@ Native Android TV dimmer for personal sideloading, Android 8 or later. No intern
 - The permission switch reflects actual overlay and precise schedule access and opens Android Settings via a chooser.
 - RESET ALL TO DEFAULT stops dimming, clears preferences and cancels alarms. Special permissions must still be revoked by the user in Android Settings.
 
+The optional **Buy me a coffee** button shows a Stripe QR code you can scan with your phone. All app features are free.
+
 ## Installation
 
-Install the supplied APK on the TV stick. If Android reports a signing conflict with an earlier build, uninstall the old app first, which clears its preferences. Version 1.6.2 uses the same testing key as the preceding 1.2 / 1.2.1 APKs delivered in this conversation and can update those installations directly. The package name remains com.example.tvdimmer, versionCode 12, versionName 1.6.2. For future update compatibility, keep one stable private signing key.
+Install the supplied APK on the TV stick. If Android reports a signing conflict with an earlier build, uninstall the old app first, which clears its preferences. The package name is com.example.tvdimmer, versionCode 18, versionName 1.6.8. For future update compatibility, keep one stable private signing key.
 
 Grant overlay permission, test level 8 first, and then test your streaming apps. Force stop or uninstall TV Dimmer in TV Settings > Apps if you need to remove the overlay. An authorized ADB connection can also use:
 

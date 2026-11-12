@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
     private void space(int height){Space s=new Space(this);body.addView(s,new LinearLayout.LayoutParams(1,dp(height)));}
     private void sectionDivider(){space(20);View line=new View(this);line.setTag("section-divider");line.setBackgroundColor(0xff444444);body.addView(line,new LinearLayout.LayoutParams(-1,dp(1)));space(20);}
     private LinearLayout row(){LinearLayout r=new LinearLayout(this);r.setOrientation(LinearLayout.HORIZONTAL);r.setGravity(Gravity.START|Gravity.CENTER_VERTICAL);center(r);return r;}
-    private TextView text(String value,int size,int color){TextView t=new TextView(this);t.setText(value);t.setTextSize(size);t.setTextColor(color);t.setGravity(Gravity.CENTER);return t;}
+    private TextView text(String value,float size,int color){TextView t=new TextView(this);t.setText(value);t.setTextSize(size);t.setTextColor(color);t.setGravity(Gravity.CENTER);return t;}
     private Button button(String value,boolean primary,Runnable callback){Button b=new Button(this);b.setText(value);b.setTextSize(15);b.setTextColor(primary?BG:TEXT);b.setTypeface(null,Typeface.BOLD);b.setAllCaps(false);b.setPadding(dp(14),dp(6),dp(14),dp(6));b.setMinWidth(0);b.setMinimumWidth(0);b.setMinHeight(0);b.setMinimumHeight(0);b.setBackgroundTintList(null);focus(b,primary?ORANGE:SURFACE,8);b.setOnClickListener(v->callback.run());return b;}
     private ColorStateList stateColors(int on,int off){return new ColorStateList(new int[][]{new int[]{android.R.attr.state_checked},new int[]{}},new int[]{on,off});}
     private Switch toggle(String label,boolean checked){Switch s=new Switch(this);s.setText(label);s.setTextSize(15);s.setTextColor(TEXT);s.setChecked(checked);s.setShowText(false);s.setSwitchPadding(dp(12));s.setPadding(0,0,dp(8),0);s.setMinHeight(dp(30));s.setMinimumHeight(dp(30));GradientDrawable thumb=new GradientDrawable();thumb.setShape(GradientDrawable.OVAL);thumb.setColor(Color.WHITE);thumb.setSize(dp(24),dp(24));s.setThumbDrawable(thumb);GradientDrawable track=shape(GRAY,14,false);track.setSize(dp(46),dp(26));s.setTrackDrawable(track);s.setSwitchMinWidth(dp(46));s.setTrackTintList(stateColors(ORANGE,GRAY));s.setThumbTintList(stateColors(Color.WHITE,0xffbbbbbb));focus(s,Color.TRANSPARENT,6);return s;}
@@ -67,7 +67,26 @@ public class MainActivity extends Activity {
         // Equal dimensions, no default button insets or minimum sizes, and an oval drawable.
         power=button("OFF",false,this::toggleNow);power.setTextSize(30);power.setSingleLine(true);power.setGravity(Gravity.CENTER);power.setPadding(0,0,0,0);power.setDefaultFocusHighlightEnabled(false);power.setStateListAnimator(null);power.setElevation(0);power.setFocusableInTouchMode(true);power.setId(View.generateViewId());
         branding.addView(power,new FrameLayout.LayoutParams(dp(112),dp(112),Gravity.CENTER));power.setOnFocusChangeListener((v,focused)->paintPower());
-        TextView credit=text("Created by Godwin Ikape",12,Color.GRAY);credit.setIncludeFontPadding(false);credit.setAlpha(0.35f);FrameLayout.LayoutParams creditParams=new FrameLayout.LayoutParams(-2,-2,Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL);creditParams.bottomMargin=dp(28);branding.addView(credit,creditParams);branding.footer=credit;
+        TextView credit=text("Created by Godwin Ikape",10.8f,Color.GRAY);credit.setIncludeFontPadding(false);credit.setAlpha(0.45f);FrameLayout.LayoutParams creditParams=new FrameLayout.LayoutParams(-2,-2,Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL);creditParams.bottomMargin=dp(28);branding.addView(credit,creditParams);branding.footer=credit;
+        Button support = button("Buy me a coffee", false, this::showSupport);
+        support.setTextSize(11);
+        support.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/Cookie-Regular.ttf"));
+        support.setSingleLine(true);
+        support.setGravity(Gravity.CENTER);
+        support.setCompoundDrawablePadding(dp(8));
+        android.graphics.drawable.Drawable cup = getDrawable(R.drawable.support_cup);
+        cup.setBounds(0, 0, dp(12), dp(12));
+        support.setCompoundDrawablesRelative(cup, null, null, null);
+        focus(support, SURFACE, 5);
+        support.setIncludeFontPadding(false);
+        support.setPadding(dp(6), 0, dp(6), 0);
+        support.setId(View.generateViewId());
+        support.setNextFocusUpId(power.getId());
+        power.setNextFocusDownId(support.getId());
+        FrameLayout.LayoutParams supportParams = new FrameLayout.LayoutParams(
+                dp(99.2f), dp(19.2f), Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+        supportParams.bottomMargin = dp(2.4f);
+        branding.addView(support, supportParams);
         levelText=text("",16,TEXT);center(levelText);
         int trackWidth=dp(520);
         slider=new SeekBar(this);slider.setMax(9);slider.setKeyProgressIncrement(1);slider.setMinimumHeight(dp(32));slider.setProgressTintList(ColorStateList.valueOf(ORANGE));slider.setThumbTintList(ColorStateList.valueOf(ORANGE));slider.setProgressBackgroundTintList(ColorStateList.valueOf(GRAY));slider.setPadding(dp(10),0,dp(10),0);focus(slider,Color.TRANSPARENT,6);
@@ -100,6 +119,24 @@ public class MainActivity extends Activity {
         slider.setOnFocusChangeListener((v,focused)->{v.setBackground(shape(Color.TRANSPARENT,6,focused));});
         load();power.requestFocus();
     }
+    private void showSupport() {
+        ImageView qr = new ImageView(this);
+        qr.setImageResource(R.drawable.support_checkout);
+        qr.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        qr.setContentDescription("Scan with your phone to open Stripe Checkout");
+        FrameLayout content = new FrameLayout(this);
+        content.setPadding(dp(24), dp(16), dp(24), dp(16));
+        content.addView(qr, new FrameLayout.LayoutParams(dp(200), dp(200), Gravity.CENTER));
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Buy me a coffee")
+                .setView(content)
+                .setPositiveButton("Close", null)
+                .create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).requestFocus();
+    }
+
     private final class BrandingPane extends FrameLayout {
         View header,footer;
         BrandingPane(Context context){super(context);}
@@ -140,9 +177,9 @@ public class MainActivity extends Activity {
     private void stopPowerPulse(){if(powerPulse!=null)powerPulse.cancel();powerStrokeOpacity=1f;paintPowerStroke();}
     private void load(){loading=true;android.content.SharedPreferences p=Plan.prefs(this);slider.setProgress(Math.max(0,Math.min(9,p.getInt("level",6)-1)));levelText.setText("Choose brightness level ("+(slider.getProgress()+1)+"/10)");boot.setChecked(p.getBoolean("boot",true));schedule.setChecked(p.getBoolean("schedule",false));int mask=p.getInt("days",127);daily.setChecked(p.getBoolean("daily",mask==127));int custom=p.getInt("customDays",mask==127?0:mask);for(int i=0;i<7;i++)days[i].setChecked((custom&(1<<i))!=0);startMinute=p.getInt("start",1380);endMinute=p.getInt("end",420);timeLabels();loading=false;updateDays();refreshPermissions();paintPower();}
     private void updateDays(){if(loading||daily==null||schedule==null)return;daily.setEnabled(schedule.isChecked());for(CheckBox d:days)if(d!=null){boolean enabled=schedule.isChecked()&&!daily.isChecked();d.setEnabled(enabled);d.setAlpha(enabled?1f:0.45f);}}
-    private void toggleNow(){boolean on=!Plan.active(this,System.currentTimeMillis());if(on&&!Settings.canDrawOverlays(this)){Toast.makeText(this,"Allow display access first",Toast.LENGTH_SHORT).show();openAccess(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);return;}Plan.prefs(this).edit().putInt("override",on?1:0).putInt("level",slider.getProgress()+1).remove("error").apply();Plan.refresh(this);paintPower();}
+    private void toggleNow(){boolean on=!Plan.active(this,System.currentTimeMillis());if(on&&!Settings.canDrawOverlays(this)){Toast.makeText(this,"Allow display access first",Toast.LENGTH_SHORT).show();openAccess(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);return;}Plan.override(on);Plan.prefs(this).edit().putInt("level",slider.getProgress()+1).remove("error").apply();Plan.refresh(this);paintPower();}
     private void save(){int mask=0;for(int i=0;i<7;i++)if(days[i].isChecked())mask|=1<<i;if(schedule.isChecked()&&!daily.isChecked()&&mask==0){Toast.makeText(this,"Choose at least one weekday",Toast.LENGTH_SHORT).show();return;}if(schedule.isChecked()&&(!Plan.exact(this)||!Settings.canDrawOverlays(this))){Toast.makeText(this,"Allow display and schedule access first",Toast.LENGTH_SHORT).show();return;}
-        android.content.SharedPreferences.Editor e=Plan.prefs(this).edit().putInt("level",slider.getProgress()+1).putBoolean("boot",boot.isChecked()).putBoolean("schedule",schedule.isChecked()).putBoolean("daily",daily.isChecked()).putInt("customDays",mask).putInt("days",daily.isChecked()?127:mask).putInt("start",startMinute).putInt("end",endMinute).putBoolean("endEnabled",true).remove("error");if(schedule.isChecked())e.putInt("override",-1);e.apply();Plan.sync(this);paintPower();Toast.makeText(this,"Preferences saved",Toast.LENGTH_SHORT).show();}
+        android.content.SharedPreferences.Editor e=Plan.prefs(this).edit().putInt("level",slider.getProgress()+1).putBoolean("boot",boot.isChecked()).putBoolean("schedule",schedule.isChecked()).putBoolean("daily",daily.isChecked()).putInt("customDays",mask).putInt("days",daily.isChecked()?127:mask).putInt("start",startMinute).putInt("end",endMinute).putBoolean("endEnabled",true).remove("error");if(schedule.isChecked())Plan.clearOverride();e.apply();Plan.sync(this);paintPower();Toast.makeText(this,"Preferences saved",Toast.LENGTH_SHORT).show();}
     private void editTime(boolean isStart){
         int value=isStart?startMinute:endMinute;LinearLayout fields=new LinearLayout(this);fields.setGravity(Gravity.CENTER);fields.setPadding(dp(24),dp(16),dp(24),dp(16));
         EditText hour=new EditText(this),minute=new EditText(this);for(EditText f:new EditText[]{hour,minute}){f.setTextSize(25);f.setTextColor(TEXT);f.setGravity(Gravity.CENTER);f.setSingleLine();f.setInputType(InputType.TYPE_CLASS_NUMBER);f.setSelectAllOnFocus(true);f.setMinWidth(dp(90));}
@@ -154,7 +191,7 @@ public class MainActivity extends Activity {
     private void openAccess(String action){try{startActivity(new Intent(action,Uri.parse("package:"+getPackageName())));}catch(RuntimeException e){try{startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+getPackageName())));}catch(RuntimeException ignored){Toast.makeText(this,"Open TV Settings > Apps > Special app access",Toast.LENGTH_LONG).show();}}}
     private void refreshPermissions(){permissionUpdate=true;permissions.setChecked(Settings.canDrawOverlays(this)&&Plan.exact(this));permissionUpdate=false;}
     private void permissionDialog(){String[] entries=Build.VERSION.SDK_INT>=31?new String[]{"Display over other apps","Precise schedules"}:new String[]{"Display over other apps"};new AlertDialog.Builder(this).setTitle("Permissions").setItems(entries,(d,which)->openAccess(which==0?Settings.ACTION_MANAGE_OVERLAY_PERMISSION:Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)).setNegativeButton("Done",null).show();}
-    private void confirmReset(){new AlertDialog.Builder(this).setTitle("Reset all to default?").setMessage("Stops dimming and clears preferences. Permissions must be turned off in Android Settings.").setNegativeButton("Cancel",null).setPositiveButton("Reset",(d,w)->{Plan.prefs(this).edit().clear().apply();Plan.sync(this);load();Toast.makeText(this,"Defaults restored",Toast.LENGTH_SHORT).show();permissionDialog();}).show();}
+    private void confirmReset(){new AlertDialog.Builder(this).setTitle("Reset all to default?").setMessage("Stops dimming and clears preferences. Permissions must be turned off in Android Settings.").setNegativeButton("Cancel",null).setPositiveButton("Reset",(d,w)->{Plan.clearOverride();Plan.prefs(this).edit().clear().apply();Plan.sync(this);load();Toast.makeText(this,"Defaults restored",Toast.LENGTH_SHORT).show();permissionDialog();}).show();}
     private final Handler handler=new Handler(Looper.getMainLooper());private final Runnable refresh=new Runnable(){public void run(){paintPower();refreshPermissions();handler.postDelayed(this,1000);}};
     @Override protected void onResume(){super.onResume();foreground=true;if(power!=null){paintPower();refreshPermissions();handler.post(refresh);}}
     @Override protected void onPause(){foreground=false;stopPowerPulse();handler.removeCallbacks(refresh);super.onPause();}
